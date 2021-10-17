@@ -9,6 +9,9 @@ PORT = 4390
 def homepage():
     return "Howdy hacker!!"
 
+@app.route('/scheduleme', methods=['POST'])
+def scheduleme():
+    return 'I would like to schedule..'
 
 if __name__ == '__main__':
     app.run(debug=True, port=PORT)
