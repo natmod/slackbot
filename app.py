@@ -15,7 +15,7 @@ def homepage():
 
 @app.route('/scheduleme', methods=['POST'])
 def scheduleme():
-    raw_text = request.form.get('text')
+    raw_text = str(request.form.get('text'))
     text_array = re.findall(r'"(.*?)"', raw_text)
     if len(text_array) != 3: 
         return 'The format is /scheduleme "[title]" "[start date & time]" "[end date & time]"'
@@ -23,7 +23,7 @@ def scheduleme():
     
     calendar_id = os.environ.get('CALENDAR_ID')
     assert calendar_id is not None, 'Missing `CALENDAR_ID` config variable'
-    access_token = os.environ.get('ACCESS_TOKEN')
+    access_token = os.environ.get('ACCESS_ID')
     assert access_token is not None, 'Missing `ACCESS_TOKEN` config variable'
     timezone = os.environ.get('TIMEZONE')
     assert timezone is not None, 'Missing `TIMEZONE` config variable'
