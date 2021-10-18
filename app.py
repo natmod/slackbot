@@ -1,8 +1,8 @@
 from flask import Flask, request
 import re
 import os
-import dateparser
 import requests
+import dateparser
 
 app = Flask(__name__)
 
@@ -13,24 +13,16 @@ PORT = 4390
 def homepage():
     return "Howdy hacker!!"
 
-
 @app.route('/scheduleme', methods=['POST'])
 def scheduleme():
-    # Get the text from the request sent by Slack
     raw_text = request.form.get('text')
-
-    # The raw_text is in wrapped in single quotes in the format '"title" "start" "end"'
-    # This regular expression unwraps the single quotes and puts all strings into an array with
-    # the format: ["title", "start", "end"]
     text_array = re.findall(r'"(.*?)"', raw_text)
-    if len(text_array) != 3:
+    if len(text_array) != 3: 
         return 'The format is /scheduleme "[title]" "[start date & time]" "[end date & time]"'
-
-    title, start, end = text_array[0], text_array[1], text_array[2]
-
-    # Get the values for the config variables that we defied on Heroku
+    title, start, end = text_array 
+    
     calendar_id = os.environ.get('CALENDAR_ID')
-    assert calendar_id is not None, 'Missing `CAL_ID` config variable'
+    assert calendar_id is not None, 'Missing `CALENDAR_ID` config variable'
     access_token = os.environ.get('ACCESS_TOKEN')
     assert access_token is not None, 'Missing `ACCESS_TOKEN` config variable'
     timezone = os.environ.get('TIMEZONE')
@@ -48,19 +40,17 @@ def scheduleme():
             'end_time': int(dateparser.parse(end, settings=timezone_settings).timestamp())
         }
     }
-    headers = {
-        'authorization': access_token
-    }
+    headers = {'authorization': access_token}
 
     try:
-        # Make a post request to the Nylas API which will create the event on the specified calendar
         response = requests.post('https://api.nylas.com/events', headers=headers, json=json)
         if response.status_code == 200:
-            return f'Wohoo! {title} was scheduled from {start} to {end}'
+            return f'Wohoo! {title} was scheduled form {start} to {end}'
         else:
-            return f'Error! Our response has a status of {response.status_code} and text {response.text}'
+            return f'Error! Our reponse has a status of {response.status_code} and text {response.text}'
     except Exception as e:
-        return f'An exception {e} occurred creating the event!'
+        return f'An exception {e} occured creating the event'
+
 
 
 if __name__ == '__main__':
